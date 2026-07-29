@@ -1,0 +1,38 @@
+{
+  "id": "unison-opp-1",
+  "noticeId": "U-001",
+  "title": "DevSecOps pipeline hardening — bulk laptop refresh",
+  "agency": "Department of the Navy",
+  "naicsCode": "541512",
+  "dueDate": "2026-08-12T17:00:00.000Z",
+  "postedDate": "2026-07-15T12:00:00.000Z",
+  "awardValue": 7800,
+  "setAside": "SDVOSBC",
+  "isSetAside": true,
+  "category": "IT_SERVICES",
+  "description": "Harden CI/CD pipelines and refresh 240 laptops across two regional sites.",
+  "uiLink": "https://unison.example.gov/buy/UB-001",
+  "scrapedAt": "2026-07-20T01:30:00.000Z",
+  "source": "UNISON",
+  "unisonBuyId": "UB-001",
+  "unisonRevision": 1,
+  "buyerType": "Federal",
+  "leadLagState": "LEAD",
+  "activeTargetPrice": 8400,
+  "bidDecrement": 50,
+  "lineItems": [
+    {
+      "clins": "0001",
+      "description": "240 ruggedized laptops, MIL-STD-810H",
+      "quantity": 240,
+      "unitOfMeasure": "EA",
+      "unitPrice": 32.5
+    }
+  ],
+  "metadata": {
+    "buyPath": "UNISON_GLOBAL",
+    "psc": "7021",
+    "fiscalYear": 2026
+  },
+  "solicitationNumber": "N00024-26-U-0001"
+}

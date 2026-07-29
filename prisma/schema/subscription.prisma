@@ -1,0 +1,38 @@
+// @polsia:user-owned — Rigel 3-tier subscription record.
+//
+// Deliberately NOT a Prisma @relation to auth.prisma's `User`: that model is
+// framework-owned (better-auth), and a relation here would demand a matching
+// back-relation field on User, which we cannot edit. Use a scalar userId
+// (`@@index([userId])`) and read User rows by id in app code instead.
+//
+// A Subscription row marks a user as paid for a one-month period that started
+// when they completed Stripe Checkout for a tier. The browser polls
+// /api/billing/subscription for the CURRENT active row (periodEnd > now,
+// status === 'active', cancelAtPeriodEnd not effective). The duration is
+// fixed at 30 days from purchase — runtime Stripe subscription checkout
+// (recurring) is not yet supported via Polsia's payment proxy (the
+// stripe-billing module's AGENT.md documents this explicitly), so each
+// renewal is a fresh one-time checkout.
+//
+// Datasource + generator live in prisma/schema/_base.prisma — do NOT
+// redeclare them here.
+
+model Subscription {
+  id                     String   @id @default(cuid())
+  // Scalar FK to auth User.id (User itself is framework-owned).
+  userId                 String
+  tier                   String // 'STARTER' | 'PROFESSIONAL' | 'ELITE'
+  status                 String   @default("active") // 'active' | 'canceled' | 'expired'
+  cancelAtPeriodEnd      Boolean  @default(false)
+  amountUsd              Decimal  @db.Decimal(10, 2)
+  stripeCheckoutSessionId String? @unique
+  periodStart            DateTime
+  periodEnd              DateTime
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, periodEnd])
+  @@index([status, periodEnd])
+  @@map("subscriptions")
+}

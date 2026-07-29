@@ -1,0 +1,37 @@
+{
+  "id": "unison-opp-3",
+  "noticeId": "U-003",
+  "title": "Network infrastructure upgrade (mirror of SAM 36C10X-24-Q-0047)",
+  "agency": "Department of Veterans Affairs",
+  "naicsCode": "541512",
+  "dueDate": "2026-08-01T17:00:00.000Z",
+  "postedDate": "2026-07-18T12:00:00.000Z",
+  "awardValue": 8500,
+  "setAside": "SDVOSBC",
+  "isSetAside": true,
+  "category": "IT_SERVICES",
+  "description": "Upgrade routing/switching stack for VA regional office.",
+  "uiLink": "https://unison.example.gov/buy/UB-003",
+  "scrapedAt": "2026-07-20T01:30:00.000Z",
+  "source": "UNISON",
+  "unisonBuyId": "UB-003",
+  "unisonRevision": 1,
+  "buyerType": "Federal",
+  "leadLagState": "LEAD",
+  "activeTargetPrice": 8800,
+  "bidDecrement": 100,
+  "lineItems": [
+    {
+      "clins": "0001",
+      "description": "Routing/switching refresh, procurement + installation",
+      "quantity": 1,
+      "unitOfMeasure": "LOT",
+      "unitPrice": 8500
+    }
+  ],
+  "metadata": {
+    "buyPath": "UNISON_GLOBAL",
+    "crossReference": "SAM.noticeId=36C10X-24-Q-0047"
+  },
+  "solicitationNumber": "36C10X-24-Q-0047"
+}

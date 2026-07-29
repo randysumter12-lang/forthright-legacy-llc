@@ -1,0 +1,107 @@
+// @polsia:user-owned — SAM.gov micro-purchase scraper feature.
+// Datasource and generator live in prisma/schema/_base.prisma — do NOT
+// redeclare them here (validator rejects duplicates).
+
+enum Source {
+  SAM
+  UNISON
+}
+
+model SamOpportunity {
+  id                 String    @id @default(cuid())
+  noticeId           String    @unique // SAM solicitation ID — stable upsert key
+  title              String
+  agency             String
+  naicsCode          String // raw NAICS code string
+  dueDate            DateTime?
+  postedDate         DateTime?
+  awardValue         Decimal?   @db.Decimal(12, 2)
+  setAside           String? // normalized e.g. "SBA", "8A", "WOSB", null
+  isSetAside         Boolean   @default(false)
+  category           String // "IT_SERVICES" | "CMMC" | "CONSULTING" | "OTHER"
+  description        String?   @db.Text
+  uiLink             String? // SAM.gov public URL
+  rawJson            Json // full original payload for audit
+  scrapedAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  source             Source    @default(SAM)                         @map("source")
+  unisonBuyId        String?                                       @map("unison_buy_id")
+  unisonRevision     Int?                                          @map("unison_revision")
+  buyerType          String?                                       @map("buyer_type")
+  leadLagState       String?                                       @map("lead_lag_state")
+  activeTargetPrice  Decimal?  @db.Decimal(12, 2)                   @map("active_target_price")
+  bidDecrement       Decimal?  @db.Decimal(12, 2)                   @map("bid_decrement")
+  lineItems          Json?     @db.JsonB                            @map("line_items")
+  metadata           Json?     @db.JsonB                            @map("metadata")
+  solicitationNumber String?                                       @map("solicitation_number")
+
+  capabilityStatement CapabilityStatement?
+  bidDraft           BidDraft?
+
+  @@index([dueDate])
+  @@index([category])
+  @@index([isSetAside, agency])
+  @@index([source])
+  @@index([solicitationNumber])
+  // Non-unique composite index only — `db push` rejects new unique indexes on
+  // populated tables ("there might be data loss … reject"). Lookup is still
+  // index-backed; dedupe hardens later once Unison rows land.
+  @@index([unisonBuyId, unisonRevision])
+  @@map("sam_opportunities")
+}
+
+model CapabilityStatement {
+  id               String   @id @default(cuid())
+  samOpportunityId String   @unique // 1:1 with SamOpportunity
+  cover            Json
+  companyOverview  Json
+  coreCompetencies Json
+  differentiators  Json
+  pastPerformance  Json
+  certifications   Json
+  contact          Json
+  fullDocument     Json
+  generatedAt      DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  samOpportunity SamOpportunity @relation(fields: [samOpportunityId], references: [id], onDelete: Cascade)
+
+  @@map("capability_statements")
+}
+
+model SamScrapeRun {
+  id            String    @id @default(cuid())
+  startedAt     DateTime  @default(now())
+  finishedAt    DateTime?
+  status        String // "RUNNING" | "OK" | "ERROR" | "RATE_LIMITED"
+  fetchedCount  Int       @default(0)
+  upsertedCount Int       @default(0)
+  errorMessage  String?
+  trigger       String // "cron" | "manual"
+  source        String?  @default("SAM") @map("source") // "SAM" | "UNISON" — nullable so legacy rows survive
+
+  @@index([startedAt])
+  @@index([source])
+  @@map("sam_scrape_runs")
+}
+
+// Auto-draft orchestrator audit row. Emits one per cron/manual trigger —
+// the orchestrator walks recent upserted SAM rows over the last scrape window,
+// qualifies each, and records per-run counts. SKIPPED is treated as a non-error
+// terminal state so a misconfigured scraper doesn't brick nightly reconciliation.
+model AutoDraftRun {
+  id              String    @id @default(cuid())
+  startedAt       DateTime  @default(now())
+  finishedAt      DateTime?
+  status          String // "RUNNING" | "OK" | "ERROR" | "SKIPPED"
+  trigger         String // "cron" | "manual"
+  considered      Int       @default(0)
+  qualified       Int       @default(0)
+  drafted         Int       @default(0)
+  skipped         Int       @default(0)
+  reasonCounts    Json?     @map("reason_counts") // { "qualify_fail": 3, "unison_band_semantics_pending": 1, ... }
+  errorMessage    String?   @map("error_message")
+
+  @@index([startedAt])
+  @@map("auto_draft_runs")
+}

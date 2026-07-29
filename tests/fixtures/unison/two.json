@@ -1,0 +1,31 @@
+{
+  "id": "unison-opp-2",
+  "noticeId": "U-002",
+  "title": "Trade study — tactical communications modernization",
+  "agency": "Department of the Army",
+  "naicsCode": "541690",
+  "dueDate": null,
+  "postedDate": "2026-07-18T12:00:00.000Z",
+  "awardValue": null,
+  "setAside": null,
+  "isSetAside": false,
+  "category": "CONSULTING",
+  "description": null,
+  "uiLink": "https://unison.example.gov/buy/UB-002",
+  "scrapedAt": "2026-07-20T01:30:00.000Z",
+  "source": "UNISON",
+  "unisonBuyId": "UB-002",
+  "unisonRevision": 3,
+  "buyerType": "Federal",
+  "leadLagState": "LAG",
+  "lineItems": [
+    {
+      "clins": "0001",
+      "description": "Trade study deliverables, whitepaper + brief",
+      "quantity": 1,
+      "unitOfMeasure": "LOT",
+      "unitPrice": 6500
+    }
+  ],
+  "solicitationNumber": "W9124-26-U-0002"
+}

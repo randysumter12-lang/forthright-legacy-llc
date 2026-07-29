@@ -1,0 +1,66 @@
+/* @polsia:user-owned — your custom global CSS: keyframes, animation classes, one-off global
+ * styles, and @import your own .css files. Prefer tw-animate-css for motion (animate-in,
+ * fade-in, slide-in-from-bottom-N, duration-*). globals.css is framework-owned — edit HERE. */
+
+/* === Landing-page ceremonial accents ===
+ * Subtle motion + structural utilities used by the home-page sections
+ * (hero badge cluster, credentials band, outcome strip, highlighted
+ * Professional tier card). Apollo-Navy + Brushed Silver theme — every
+ * utility references existing --accent / --brand-* tokens. */
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.55;
+  }
+  92% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.scanline {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--accent) 30%,
+    var(--accent) 70%,
+    transparent 100%
+  );
+  animation: scanline 6s linear infinite;
+  pointer-events: none;
+}
+
+.silver-divider {
+  background-color: var(--accent);
+  opacity: 0.6;
+}
+
+/* Highlighted tier card — inked silver hairline across the top edge plus an
+ * inset glow so the Professional tier visibly pops above the other two. */
+.brushed-edge {
+  position: relative;
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in oklch, var(--accent) 60%, transparent),
+    inset 0 0 0 1px color-mix(in oklch, var(--accent) 25%, transparent),
+    0 12px 28px -6px var(--elevation-2),
+    0 4px 10px -4px var(--elevation-1);
+}
+
+/* Credential badges — soft navy halo so the Navy + Minority-Owned seals read
+ * as institutional, not decorative. */
+.credentials-badge-ring {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklch, var(--accent) 30%, transparent),
+    0 8px 18px -8px color-mix(in oklch, var(--brand-700) 40%, transparent);
+}

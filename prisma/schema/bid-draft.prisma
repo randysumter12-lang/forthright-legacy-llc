@@ -1,0 +1,51 @@
+// @polsia:user-owned — Bid Draft model. Linked 1:1 to SamOpportunity; the
+// back-relation lives on sam-opportunity.prisma (mirrors the CapabilityStatement
+// precedent). Datasource + generator live in prisma/schema/_base.prisma —
+// do NOT redeclare them here.
+
+// Outcome enum for SUBMITTED bids. WON / LOST / NO_RESPONSE are the three
+// terminal states tracked by POST /api/bids/<id>/outcome. The matching JS-side
+// runtime list is `OUTCOME` in src/lib/contracts/bid-draft.ts.
+enum BidOutcome {
+  WON
+  LOST
+  NO_RESPONSE
+}
+
+model BidDraft {
+  id               String   @id @default(cuid())
+  samOpportunityId String   @unique // 1:1 with SamOpportunity
+  ownerUserId      String?  @map("owner_user_id") // nullable so legacy rows survive; auto-draft orchestrator populates from first active subscription holder
+  status           String // 'DRAFT' | 'REVIEW' | 'SUBMITTED'
+  cover            Json
+  technicalApproach Json
+  staffing         Json
+  pricingSummary   Json
+  pastPerformance  Json
+  complianceMatrix Json
+  markdown         String   @db.Text
+  revision         Int      @default(0)
+  generatedAt      DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  // Submission audit fields — all nullable so legacy rows survive. populated
+  // by the POST /api/bids/<id>/submit helper in a single transaction that
+  // flips status to 'SUBMITTED' alongside the audit append.
+  submittedAt       DateTime?                                       @map("submitted_at")
+  submittedByUserId String?                                         @map("submitted_by_user_id")
+  submissionAudit   Json?     @db.JsonB                             @map("submission_audit")
+
+  // Outcome (WON | LOST | NO_RESPONSE) — populated by POST /api/bids/<id>/outcome
+  // on SUBMITTED rows. All four columns are nullable so legacy rows survive;
+  // `outcomeAudit` is the JSONB array of OutcomeAuditEntry shape (version: 1)
+  // parallel to submissionAudit. First outcome wins — a POST on a row that
+  // already carries an outcome returns 409 from the route handler.
+  outcome        BidOutcome?                                       @map("outcome")
+  outcomeAt      DateTime?                                         @map("outcome_at")
+  outcomeNotes   String?                                           @map("outcome_notes")
+  outcomeAudit   Json?     @db.JsonB                               @map("outcome_audit")
+
+  samOpportunity SamOpportunity @relation(fields: [samOpportunityId], references: [id], onDelete: Cascade)
+
+  @@index([ownerUserId])
+  @@map("bid_drafts")
+}
